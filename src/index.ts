@@ -6,6 +6,7 @@ import Visitor from "./models/Visitor.js";
 import "dotenv/config";
 import { env } from "./config/envConfig.js";
 import { connectDB } from "./DB/dbconnection.js";
+import  cors  from "cors";
 
 const app = express();
 
@@ -14,6 +15,13 @@ declare module "express-session" {
     hasVisited: boolean;
   }
 }
+
+app.use(
+  cors({
+    origin: "https://aman-asthana.vercel.app" ,
+    credentials: true,
+  })
+);
 
 app.use(
   session({
