@@ -18,7 +18,7 @@ declare module "express-session" {
 
 app.use(
   cors({
-    origin: ["https://aman-asthana.vercel.app" , "http://localhost:5173"],
+    origin: ["https://aman-asthana.vercel.app" , "http://localhost:5173" , "*"],
     credentials: true,
   }),
 );
@@ -34,8 +34,8 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 5,
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+       secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   }),
 );
