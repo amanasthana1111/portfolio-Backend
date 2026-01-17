@@ -18,7 +18,7 @@ declare module "express-session" {
 
 app.use(
   cors({
-    origin: "https://aman-asthana.vercel.app",
+    origin: ["https://aman-asthana.vercel.app" , "http://localhost:5173"],
     credentials: true,
   }),
 );
@@ -40,24 +40,29 @@ app.use(
   }),
 );
 
-app.get("/api/visit", async (req: Request, res: Response) => {
-  try {
-    if (!req.session.hasVisited) {
-      const data = await Visitor.findOneAndUpdate(
-        { counterName: "total_visitors" },
-        { $inc: { count: 1 } },
-        { upsert: true, new: true },
-      );
-      req.session.hasVisited = true;
-      return res.json({ total: data?.count, mess: "New User" });
-    }
 
-    const data = await Visitor.findOne({ counterName: "total_visitors" });
-    res.json({ total: data?.count, mess: "Old User" });
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
+app.get("/api/visit", async (req, res) => {
+  console.log("SessionID:", req.sessionID);
+  console.log("Visited before:", req.session.hasVisited);
+
+  if (req.session.hasVisited !== true) {
+    const data = await Visitor.findOneAndUpdate(
+      { counterName: "total_visitors" },
+      { $inc: { count: 1 } },
+      { upsert: true, new: true }
+    );
+
+    req.session.hasVisited = true;
+
+    return req.session.save(() => {
+      res.json({ total: data.count, mess: "New User" });
+    });
   }
+
+  const data = await Visitor.findOne({ counterName: "total_visitors" });
+  return res.json({ total: data?.count, mess: "Old User" });
 });
+
 const main = async () => {
   try {
     await connectDB();
