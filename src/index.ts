@@ -6,7 +6,7 @@ import Visitor from "./models/Visitor.js";
 import "dotenv/config";
 import { env } from "./config/envConfig.js";
 import { connectDB } from "./DB/dbconnection.js";
-import  cors  from "cors";
+import cors from "cors";
 
 const app = express();
 
@@ -18,9 +18,9 @@ declare module "express-session" {
 
 app.use(
   cors({
-    origin: "https://aman-asthana.vercel.app" ,
+    origin: "https://aman-asthana.vercel.app",
     credentials: true,
-  })
+  }),
 );
 
 app.use(
@@ -32,11 +32,13 @@ app.use(
       mongoUrl: env.MONGODB_URI,
     }),
     cookie: {
-      maxAge: 1000 * 60 *5,
+      maxAge: 1000 * 60 * 5,
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
     },
-  })
+  }),
 );
-
 
 app.get("/api/visit", async (req: Request, res: Response) => {
   try {
@@ -47,24 +49,22 @@ app.get("/api/visit", async (req: Request, res: Response) => {
         { upsert: true, new: true },
       );
       req.session.hasVisited = true;
-      return res.json({ total: data?.count , mess:"New User" });
+      return res.json({ total: data?.count, mess: "New User" });
     }
 
     const data = await Visitor.findOne({ counterName: "total_visitors" });
-    res.json({ total: data?.count, mess:"Old User" });
+    res.json({ total: data?.count, mess: "Old User" });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
   }
 });
-const main = async()=>{
-   try {
-     await connectDB()
+const main = async () => {
+  try {
+    await connectDB();
     app.listen(5000, () => console.log("Server running on port 5000"));
-   } catch (error) {
-    console.log(error)
-   }
-
-
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 main();
