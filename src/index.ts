@@ -18,7 +18,7 @@ declare module "express-session" {
 
 app.use(
   cors({
-    origin: ["https://aman-asthana.vercel.app" , "http://localhost:5173" , "*"],
+    origin: ["https://aman-asthana.vercel.app"],
     credentials: true,
   }),
 );
