@@ -32,7 +32,7 @@ app.use(
       mongoUrl: env.MONGODB_URI,
     }),
     cookie: {
-      maxAge: 1000 * 60,
+      maxAge: 1000 * 60 *5,
     },
   })
 );
