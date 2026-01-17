@@ -33,9 +33,12 @@ app.use(
     }),
     cookie: {
       maxAge: 1000 * 60 * 5,
+      sameSite: "none", 
+      secure: true,  
     },
-  }),
+  })
 );
+
 
 app.get("/api/visit", async (req: Request, res: Response) => {
   try {
