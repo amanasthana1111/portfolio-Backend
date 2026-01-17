@@ -33,9 +33,6 @@ app.use(
     }),
     cookie: {
       maxAge: 1000 * 60,
-      sameSite: "none", 
-      secure: true, 
-      httpOnly: true, 
     },
   })
 );
@@ -50,11 +47,11 @@ app.get("/api/visit", async (req: Request, res: Response) => {
         { upsert: true, new: true },
       );
       req.session.hasVisited = true;
-      return res.json({ total: data?.count });
+      return res.json({ total: data?.count , mess:"New User" });
     }
 
     const data = await Visitor.findOne({ counterName: "total_visitors" });
-    res.json({ total: data?.count });
+    res.json({ total: data?.count, mess:"Old User" });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
   }
