@@ -22,7 +22,7 @@ app.use(
     credentials: true,
   }),
 );
-
+console.log(process.env.AMAN);
 app.use(
   session({
     secret: "your_secret_key",
@@ -34,12 +34,11 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 5,
       httpOnly: true,
-       secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.AMAN === "production",
+      sameSite: process.env.AMAN === "production" ? "none" : "lax",
     },
   }),
 );
-
 
 app.get("/api/visit", async (req, res) => {
   console.log("SessionID:", req.sessionID);
@@ -49,7 +48,7 @@ app.get("/api/visit", async (req, res) => {
     const data = await Visitor.findOneAndUpdate(
       { counterName: "total_visitors" },
       { $inc: { count: 1 } },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     req.session.hasVisited = true;
