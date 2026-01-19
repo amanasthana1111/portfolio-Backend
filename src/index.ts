@@ -9,7 +9,7 @@ import { connectDB } from "./DB/dbconnection.js";
 import cors from "cors";
 
 const app = express();
-
+app.set("trust proxy", 1);
 declare module "express-session" {
   interface SessionData {
     hasVisited: boolean;
@@ -22,9 +22,10 @@ app.use(
     credentials: true,
   }),
 );
-console.log(process.env.AMAN);
+
 app.use(
   session({
+    name: "visitor.sid",
     secret: "your_secret_key",
     resave: false,
     saveUninitialized: false,
@@ -34,11 +35,12 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 5,
       httpOnly: true,
-      secure: process.env.AMAN === "production",
-      sameSite: process.env.AMAN === "production" ? "none" : "lax",
+      secure: true,        // MUST be true in production
+      sameSite: "none",    // REQUIRED for cross-site cookies
     },
   }),
 );
+
 
 app.get("/api/visit", async (req, res) => {
   console.log("SessionID:", req.sessionID);
@@ -65,7 +67,7 @@ app.get("/api/visit", async (req, res) => {
 const main = async () => {
   try {
     await connectDB();
-    app.listen(5000, () => console.log("Server running on port 5000"));
+    app.listen(process.env.PORT, () => console.log("Server running on port " + process.env.PORT));
   } catch (error) {
     console.log(error);
   }
