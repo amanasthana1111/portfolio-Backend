@@ -7,8 +7,10 @@ import "dotenv/config";
 import { env } from "./config/envConfig.js";
 import { connectDB } from "./DB/dbconnection.js";
 import cors from "cors";
+import { BlogModel } from "./models/Blog.js";
 
 const app = express();
+app.use(express.json());
 app.set("trust proxy", 1);
 declare module "express-session" {
   interface SessionData {
@@ -62,6 +64,55 @@ app.get("/api/visit", async (req, res) => {
 
   const data = await Visitor.findOne({ counterName: "total_visitors" });
   return res.json({ total: data?.count, mess: "Old User" });
+});
+
+app.get("/blogs", async (req, res) => {
+  try {
+    const data = await BlogModel.find({});
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching blogs" });
+  }
+});
+
+
+app.get("/blogs/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await BlogModel.findOne({ id });
+
+    if (!data) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching blog" });
+  }
+});
+
+app.post("/blogs/edit", async (req, res) => {
+  try {
+    const { id, title, desc, tags, imglink, paragraphs, moreImg } = req.body;
+
+    const newBlog = new BlogModel({
+      id,
+      title,
+      desc,
+      tags,
+      imglink,
+      paragraphs,
+      moreImg
+    });
+
+    const savedBlog = await newBlog.save();
+
+    res.status(201).json(savedBlog);
+
+  } catch (err) {
+    res.status(500).json({ message: "Error creating blog" });
+  }
 });
 
 const main = async () => {
