@@ -115,6 +115,12 @@ app.post("/blogs/edit", async (req, res) => {
   }
 });
 
+app.get("/",(req,res)=>{
+  res.json({
+    mess : "Server is fine"
+  })
+})
+
 const main = async () => {
   try {
     await connectDB();
